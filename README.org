@@ -1,0 +1,68 @@
+* Trends
+Trends shows trends of a country from [[https://trends.google.com/trends/?geo=GB][google daily trends]] or
+sorted left "gundem" frame from [[https://eksisozluk.com][eksisozluk]].
+* Installation
+#+BEGIN_SRC bash
+cd trends
+install trends ~/.local/bin/
+# install trends <DESIRED_LOCATION_SHOULD_BE_IN_THE_PATH>
+#+END_SRC
+* Usage
+#+BEGIN_SRC bash
+trends [ -g|--google <CC> [count] | -e|--eksi [count] ]
+# < required >
+# [ optional ]
+#+END_SRC
+* Examples
+** Basic Usage
+#+BEGIN_SRC bash
+trends --eksi
+#+END_SRC
+
+#+RESULTS:
+ • 573 | van'da arama kurtarma ekibinin üzerine çığ düşmesi
+ • 524 | yalın'ın zalim parçasının yazarlardaki hatırası
+ • 362 | cnn türk'ün ismi cnn akp olarak değiştirilsin
+ • 349 | ak parti'den önceki türkiye
+ • 275 | izlenmiş en iyi konser
+ • 270 | bir çocuğa zarar gelecekse 1000 köpek öldürülsün
+ • 259 | makasla üzerine yürüyen kadını öldüren polis
+ • 251 | mustafa kemal'in batılı olalım takıntısı
+ • 237 | türk okullarında zorbalık olmaması
+ • 225 | geceye bir obez atasözü bırak
+ 
+ 
+#+BEGIN_SRC bash
+trends --google GB
+#+END_SRC
+
+#+RESULTS:
+ • Kirk Douglas
+ • Odion Ighalo
+ • Tottenham vs Southampton
+ • Nancy Pelosi
+ • John Caudwell
+ • Rangers vs Hibernian
+ • Eminem
+ • Kevin Kilbane
+ • Ralf Little
+ • Storm Ciara
+** Limit Count of Results
+#+BEGIN_SRC bash
+trends -e 3
+#+END_SRC
+
+#+RESULTS:
+ • 573 | van'da arama kurtarma ekibinin üzerine çığ düşmesi
+ • 524 | yalın'ın zalim parçasının yazarlardaki hatırası
+ • 362 | cnn türk'ün ismi cnn akp olarak değiştirilsin
+
+ 
+#+BEGIN_SRC bash
+trends -g GB 3
+#+END_SRC
+
+#+RESULTS:
+ • Kirk Douglas
+ • Odion Ighalo
+ • Tottenham vs Southampton
