@@ -1,25 +1,22 @@
 * Trends
-Trends shows trends of a country from [[https://trends.google.com/trends/?geo=GB][google daily trends]] or
+Trends shows trends of a limitry from [[https://trends.google.com/trends/?geo=GB][google daily trends]] or
 sorted left "gundem" frame from [[https://eksisozluk.com][eksisozluk]].
 * Installation
-#+BEGIN_SRC bash
+#+BEGIN_SRC shell
 cd trends
-install trends ~/.local/bin/
+install ./trends ~/.local/bin/
 # install trends <DESIRED_LOCATION_SHOULD_BE_IN_THE_PATH>
 #+END_SRC
 * Usage
-#+BEGIN_SRC bash
-trends [ -g|--google <CC> [count] | -e|--eksi [count] ]
-# < required >
-# [ optional ]
+#+BEGIN_SRC shell
+trends < -g|--google <CC> [limit] | -e|--eksi [limit] >
 #+END_SRC
+=Note= < required >, [ optional ]
 * Examples
 ** Basic Usage
-#+BEGIN_SRC bash
-trends --eksi
-#+END_SRC
-
-#+RESULTS:
+Show eksisozluk gundem.
+#+BEGIN_SRC shell
+$ trends --eksi
  • 573 | van'da arama kurtarma ekibinin üzerine çığ düşmesi
  • 524 | yalın'ın zalim parçasının yazarlardaki hatırası
  • 362 | cnn türk'ün ismi cnn akp olarak değiştirilsin
@@ -30,13 +27,12 @@ trends --eksi
  • 251 | mustafa kemal'in batılı olalım takıntısı
  • 237 | türk okullarında zorbalık olmaması
  • 225 | geceye bir obez atasözü bırak
- 
- 
-#+BEGIN_SRC bash
-trends --google GB
 #+END_SRC
-
-#+RESULTS:
+ 
+ 
+Show google trends for Great Britain.
+#+BEGIN_SRC shell
+$ trends --google GB
  • Kirk Douglas
  • Odion Ighalo
  • Tottenham vs Southampton
@@ -47,22 +43,19 @@ trends --google GB
  • Kevin Kilbane
  • Ralf Little
  • Storm Ciara
-** Limit Count of Results
-#+BEGIN_SRC bash
-trends -e 3
 #+END_SRC
-
-#+RESULTS:
+** Limiting the Result
+#+BEGIN_SRC shell
+$ trends -e 3
  • 573 | van'da arama kurtarma ekibinin üzerine çığ düşmesi
  • 524 | yalın'ın zalim parçasının yazarlardaki hatırası
  • 362 | cnn türk'ün ismi cnn akp olarak değiştirilsin
-
- 
-#+BEGIN_SRC bash
-trends -g GB 3
 #+END_SRC
 
-#+RESULTS:
+ 
+#+BEGIN_SRC shell
+$ trends -g GB 3
  • Kirk Douglas
  • Odion Ighalo
  • Tottenham vs Southampton
+#+END_SRC
