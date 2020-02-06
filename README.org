@@ -1,5 +1,5 @@
 * Trends
-Trends shows trends of a limitry from [[https://trends.google.com/trends/?geo=GB][google daily trends]] or
+Trends shows trends of a country from [[https://trends.google.com/trends/?geo=GB][google daily trends]] or
 sorted left "gundem" frame from [[https://eksisozluk.com][eksisozluk]].
 * Installation
 #+BEGIN_SRC shell
