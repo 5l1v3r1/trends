@@ -1,19 +1,19 @@
 * Trends
 Trends shows trends of a country from [[https://trends.google.com/trends/?geo=GB][google daily trends]] or
 sorted left "gundem" frame from [[https://eksisozluk.com][eksisozluk]].
-* Installation
+** Installation
 #+BEGIN_SRC shell
 cd trends
 install ./trends ~/.local/bin/
 #+END_SRC
-=Note=: install trends <DESIRED LOCATION SHOULD BE IN THE PATH>
-* Usage
+=Note:= install trends <DESIRED LOCATION SHOULD BE IN THE PATH>
+** Usage
 #+BEGIN_SRC shell
 trends < -g|--google <CC> [limit] | -e|--eksi [limit] >
 #+END_SRC
-=Note=: < required >, [ optional ]
-* Examples
-** Basic Usage
+=Note:= < required > [ optional ]
+** Examples
+*** Basic Usage
 Show eksisozluk gundem.
 #+BEGIN_SRC shell
 $ trends --eksi
@@ -44,7 +44,7 @@ $ trends --google GB
  • Ralf Little
  • Storm Ciara
 #+END_SRC
-** Limiting the Result
+*** Limiting the Result
 #+BEGIN_SRC shell
 $ trends -e 3
  • 573 | van'da arama kurtarma ekibinin üzerine çığ düşmesi
