@@ -5,8 +5,8 @@ sorted left "gundem" frame from [[https://eksisozluk.com][eksisozluk]].
 #+BEGIN_SRC shell
 cd trends
 install ./trends ~/.local/bin/
-=Note=: install trends <DESIRED_LOCATION_SHOULD_BE_IN_THE_PATH>
 #+END_SRC
+=Note=: install trends <DESIRED LOCATION SHOULD BE IN THE PATH>
 * Usage
 #+BEGIN_SRC shell
 trends < -g|--google <CC> [limit] | -e|--eksi [limit] >
