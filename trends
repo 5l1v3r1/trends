@@ -5,8 +5,8 @@
 # TODO Store history in sqlite with dates.
 
 usage() {
-	toolname=$(echo $0 | awk -F'/' '{ printf $NF}')
-	>&2 echo "usage: $toolname < -g|--google <CC> | -e|--eksi [limit] >";
+	name=$(echo $0 | awk -F'/' '{ printf $NF}')
+	>&2 echo "usage: $name < -g|--google <CC> [limit] | -e|--eksi [limit] >";
 }
 colored() {
 	colorcode=1;
@@ -27,7 +27,7 @@ case "$1" in
 			cc=$2;
 			if [ "$3" = "" ] || [ $3 -gt 20 ]; then limit=10; else limit=$3; fi
 		fi ;;
-	(-e|--eksi) eksi=true; [ "$2" = "" ] && limit=20 || limit=$2 ;;
+	(-e|--eksi) eksi=true; [ "$2" = "" ] && limit=10 || limit=$2 ;;
 	(-h|--help) usage; exit 0 ;;
 	(*) usage; exit 2 ;;
 esac
@@ -43,6 +43,6 @@ elif [ "$eksi" = "true" ]; then
 	file=/tmp/eksitrends.txt
 	curl -s https://eksisozluk.com | 
 		pup -p '.topic-list.partial > li a text{}' | paste -d "|"  - - |
-		awk -F'|' '{ print $2,"|", $1}' | sort -nr > $file;
+		awk -F'|' '{ sub(/b/,"00",$2); print $2, "|", $1; }' | sort -nr > $file;
 		cat $file | head -n $limit | colored
 fi
