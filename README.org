@@ -5,13 +5,13 @@ sorted left "gundem" frame from [[https://eksisozluk.com][eksisozluk]].
 #+BEGIN_SRC shell
 cd trends
 install ./trends ~/.local/bin/
-# install trends <DESIRED_LOCATION_SHOULD_BE_IN_THE_PATH>
+=Note=: install trends <DESIRED_LOCATION_SHOULD_BE_IN_THE_PATH>
 #+END_SRC
 * Usage
 #+BEGIN_SRC shell
 trends < -g|--google <CC> [limit] | -e|--eksi [limit] >
 #+END_SRC
-=Note= < required >, [ optional ]
+=Note=: < required >, [ optional ]
 * Examples
 ** Basic Usage
 Show eksisozluk gundem.
