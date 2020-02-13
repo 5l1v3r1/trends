@@ -18,7 +18,6 @@ colored() {
 }
 
 # Args
-# unset cc; unset google; unset eksi
 case "$1" in
 	(-g|--google)
 		google=true;
