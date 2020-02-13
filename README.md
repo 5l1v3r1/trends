@@ -4,6 +4,11 @@ Trends shows trends of a country from [google daily
 trends](https://trends.google.com/trends/?geo=GB) or sorted left "gundem" frame
 from [eksisozluk](https://eksisozluk.com).
 
+## Requirements
+
+- [cURL](https://github.com/curl/curl) - A command line tool and library for transferring data with URL syntax.
+- [pup](https://github.com/ericchiang/pup) - Parsing HTML at the command line.
+
 ## Installation
 
 ```sh
@@ -56,7 +61,6 @@ $ trends --google GB
 ```
 
 ### Limiting the Result
-
 
 ```sh
 $ trends -e 3
