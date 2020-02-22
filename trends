@@ -6,7 +6,7 @@
 
 usage() {
 	name=$(echo $0 | awk -F'/' '{ printf $NF}')
-	>&2 echo "usage: $name < -g|--google <CC> [limit] | -e|--eksi [limit] >";
+	>&2 echo "usage: $name [ -e ] [ -g ] [ -l limit ] [ -n countrycode ]";
 }
 colored() {
 	colorcode=1;
@@ -17,31 +17,40 @@ colored() {
 	done
 }
 
+eksi=false
+google=false
+nation=GB
+usecolor=false
+limit=10
+
 # Args
-case "$1" in
-	(-g|--google)
-		google=true;
-		if [ "$2" = "" ];then usage; exit 2;
-		else
-			cc=$2;
-			if [ "$3" = "" ] || [ $3 -gt 20 ]; then limit=10; else limit=$3; fi
-		fi ;;
-	(-e|--eksi) eksi=true; [ "$2" = "" ] && limit=10 || limit=$2 ;;
-	(-h|--help) usage; exit 0 ;;
-	(*) usage; exit 2 ;;
-esac
+while getopts :egcl:n: args; do
+	case $args in
+		(e) eksi=true;;
+		(c) usecolor=true;;
+		(l) limit="$OPTARG";;
+		(g) google=true;;
+		(n) google=true; nation=`echo $OPTARG | tr [:lower:] [:upper:]`;;
+		(h) usage; exit 0;;
+		([?]) usage; exit 2;;
+	esac
+done
+goourl=https://trends.google.com/trends/trendingsearches/daily/rss?geo=$nation
+eksurl=https://eksisozluk.com
 
 # Request & Results
-if [ "$google" = "true" ]; then
-	file=/tmp/googletrends.txt
-	curl -s https://trends.google.com/trends/trendingsearches/daily/rss?geo=$cc|
-			grep -o '<title>.*<\/title>' |
-		sed 's/^\s*<title>\(.*\)<\/title>/\1/;1d' > $file
-	cat $file | head -n $limit | colored
-elif [ "$eksi" = "true" ]; then
+if $eksi || ! $google; then
 	file=/tmp/eksitrends.txt
-	curl -s https://eksisozluk.com | 
+	curl -s  $eksurl | 
 		pup -p '.topic-list.partial > li a text{}' | paste -d "|"  - - |
 		awk -F'|' '{ sub(/b/,"00",$2); print $2, "|", $1; }' | sort -nr > $file;
-		cat $file | head -n $limit | colored
+		cat $file | head -n $limit |
+			if $usecolor; then colored; else cat /dev/stdin; fi
+fi
+if $google; then
+	file=/tmp/googletrends.txt
+	curl -s $goourl | grep -o '<title>.*<\/title>' |
+		sed 's/^\s*<title>\(.*\)<\/title>/\1/;1d' > $file
+	cat $file | head -n $limit |
+		if $usecolor; then colored; else cat /dev/stdin; fi 
 fi

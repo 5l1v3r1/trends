@@ -13,17 +13,24 @@ from [eksisozluk](https://eksisozluk.com).
 
 ```sh
 cd trends
-mkdir -p ~/.local/bin
-install ./trends ~/.local/bin/
+mkdir -p /usr/local/bin
+install ./trends /usr/local/bin
 ```
 
 ## Usage
 
 ```sh
-trends < -g|--google <CC> [limit] | -e|--eksi [limit] >
+trends [ -e ] [ -g ] [ -l limit ] [ -n countrycode ]
 ```
 
 > Note `< required >` `[ optional ]`
+
+### Options
+- `-e`		eksisozluk `(default if no args given)`
+- `-g`		show google daily trends for default nation (GB).
+- `-c`		color top 3 trends.
+- `-n CC`	show google daily trends of specified nation.
+- `-l NR`	limit `(default: 10)`
 
 ## Examples
 ### Basic Usage
@@ -31,47 +38,73 @@ trends < -g|--google <CC> [limit] | -e|--eksi [limit] >
 Show eksisozluk gundem.
 
 ```sh
-$ trends --eksi
- • 573 | van'da arama kurtarma ekibinin üzerine çığ düşmesi
- • 524 | yalın'ın zalim parçasının yazarlardaki hatırası
- • 362 | cnn türk'ün ismi cnn akp olarak değiştirilsin
- • 349 | ak parti'den önceki türkiye
- • 275 | izlenmiş en iyi konser
- • 270 | bir çocuğa zarar gelecekse 1000 köpek öldürülsün
- • 259 | makasla üzerine yürüyen kadını öldüren polis
- • 251 | mustafa kemal'in batılı olalım takıntısı
- • 237 | türk okullarında zorbalık olmaması
- • 225 | geceye bir obez atasözü bırak
+$ trends
+```
+```txt
+564 | cennetten indiği düşünülen melodi 
+405 | atakan kayalar 
+328 | wuhan virüsü 
+309 | süleyman soylu'nun polis mesaisi açıklaması 
+271 | türklerin hıristiyan olması halinde olabilecekler 
+269 | elif can yetim 
+222 | illerin en kötü ilçeleri 
+209 | sevgili edinme konusunda hiçbir şey yapmayan insan 
+197 | adil rami 
+193 | setenay cankat'ın a spor'dan kovulması 
 ```
  
-Show google trends for Great Britain.
+Show google trends for default nation (Great Britain).
 
 ```sh
-$ trends --google GB
- • Kirk Douglas
- • Odion Ighalo
- • Tottenham vs Southampton
- • Nancy Pelosi
- • John Caudwell
- • Rangers vs Hibernian
- • Eminem
- • Kevin Kilbane
- • Ralf Little
- • Storm Ciara
+$ trends -g
+```
+```txt
+Sussex Royal
+Bayern Munich
+Virgin cruises
+Tyson Fury fight
+Quaden Bayles
+Friends
+EastEnders
+Judy Finnigan
+JLS tickets
+June Brown
 ```
 
 ### Limiting the Result
 
+For eksisozluk
 ```sh
-$ trends -e 3
- • 573 | van'da arama kurtarma ekibinin üzerine çığ düşmesi
- • 524 | yalın'ın zalim parçasının yazarlardaki hatırası
- • 362 | cnn türk'ün ismi cnn akp olarak değiştirilsin
+$ trends -el3
+```
+```txt
+573 | van'da arama kurtarma ekibinin üzerine çığ düşmesi
+524 | yalın'ın zalim parçasının yazarlardaki hatırası
+362 | cnn türk'ün ismi cnn akp olarak değiştirilsin
 ```
  
+For google
 ```sh
-$ trends -g GB 3
- • Kirk Douglas
- • Odion Ighalo
- • Tottenham vs Southampton
+$ trends -nGB -l3
 ```
+```txt
+Sussex Royal
+Bayern Munich
+Virgin cruises
+```
+
+### Showing Both Platforms with the Limit 3 and Nation TR for Google
+```sh
+$ trends -egl3 -ntr
+```
+```txt
+565 | cennetten indiği düşünülen melodi 
+400 | atakan kayalar 
+326 | wuhan virüsü 
+Setenay Cankat
+Hercai 33. bölüm
+Muhterem Nur
+```
+
+> Note: No need to specify -g if the -n option used. Because nation option is
+> only available for google trends, not others.
