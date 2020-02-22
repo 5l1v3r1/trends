@@ -1,5 +1,6 @@
 #!/bin/sh
 #
+# Getopts added at 2020 Feb 22
 # Eksi and limit options added at 2020 Feb 5 22:40
 #
 # TODO Store history in sqlite with dates.
