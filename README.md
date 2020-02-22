@@ -26,11 +26,11 @@ trends [ -e ] [ -g ] [ -l limit ] [ -n countrycode ]
 > Note `< required >` `[ optional ]`
 
 ### Options
-- `-e`		eksisozluk `(default if no args given)`
-- `-g`		show google daily trends for default nation (GB).
-- `-c`		color top 3 trends.
-- `-n CC`	show google daily trends of specified nation.
-- `-l NR`	limit `(default: 10)`
+- `-e`		**eksisozluk (is the default option if no args given).**
+- `-g`		**show google daily trends for default nation (GB).**
+- `-c`		**color the top 3 trends.**
+- `-n CC`	**show google daily trends of specified nation.**
+- `-l NR`	**limit (default: 10)**
 
 ## Examples
 ### Basic Usage
@@ -71,7 +71,7 @@ JLS tickets
 June Brown
 ```
 
-### Limiting the Result
+### Limiting
 
 For eksisozluk
 ```sh
@@ -93,6 +93,13 @@ Bayern Munich
 Virgin cruises
 ```
 
+### Coloring (using tput)
+```sh
+$ trends -ec
+```
+![image](./img/colored_output.png "Colored Output")
+
+
 ### Showing Both Platforms with the Limit 3 and Nation TR for Google
 ```sh
 $ trends -egl3 -ntr
@@ -107,4 +114,5 @@ Muhterem Nur
 ```
 
 > Note: No need to specify -g if the -n option used. Because nation option is
-> only available for google trends, not others.
+> only available for google trends, not others. So it is automatically triggers
+> google option.
