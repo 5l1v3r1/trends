@@ -27,6 +27,7 @@ trends [ -e ] [ -g ] [ -l limit ] [ -n countrycode ]
 
 ### Options
 - `-e`		**eksisozluk (is the default option if no args given).**
+- `-r`		**disable eksisozluk rate.**
 - `-g`		**show google daily trends for default nation (GB).**
 - `-c`		**color the top 3 trends.**
 - `-n CC`	**show google daily trends of specified nation.**
@@ -99,6 +100,22 @@ $ trends -ec
 ```
 ![image](./img/colored_output.png "Colored Output")
 
+### Disable Rates
+```sh
+$ trends -er
+```
+```txt
+23 şubat 2020 fenerbahçe galatasaray maçı 
+üniversitede sevgilisiyle kalan kızla evlenmek 
+wuhan virüsü 
+22 şubat 2020 van'da corona virüs şüphesi 
+playstation 1'de oynanmış en güzel oyun 
+ersun yanal 
+seni de seni seveni de sevmiyoruz 
+23 şubat 2020 kadıköy belediyesi paylaşımı 
+ruh eşin nerede 
+ali koç 
+```
 
 ### Showing Both Platforms with the Limit 3 and Nation TR for Google
 ```sh
