@@ -44,7 +44,7 @@ if $eksi || ! $google; then
 	file=/tmp/eksitrends.txt
 	curl -s  $eksurl | 
 		pup -p '.topic-list.partial > li a text{}' | paste -d "|"  - - |
-		awk -F'|' '{ sub(/b/,"00",$2); print $2, "|", $1; }' | sort -nr > $file;
+		awk -F'|' '{ sub(/b/,"00",$2); print $2, ":", $1; }' | sort -nr > $file;
 		cat $file | head -n $limit |
 			if $usecolor; then colored; else cat /dev/stdin; fi
 fi
