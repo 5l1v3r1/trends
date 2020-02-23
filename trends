@@ -1,9 +1,7 @@
 #!/bin/sh
 #
-# Getopts added at 2020 Feb 22
-# Eksi and limit options added at 2020 Feb 5 22:40
-#
 # TODO Store history in sqlite with dates.
+#
 
 usage() {
 	name=$(echo $0 | awk -F'/' '{ printf $NF}')
@@ -47,11 +45,11 @@ if $eksi || ! $google; then
 	curl -s  $eksurl | 
 		pup -p '.topic-list.partial > li a text{}' | paste -d "|"  - - |
 		if $rate; then
-			awk -F'|' '{ sub(/b/,"00",$2); print $2, ":", $1; }' |
-				sort -nr > $file;
+			awk -F'|' '{ sub(/b/,"00",$2); sub(/,/,"",$2); print $2, ":", $1; }' |
+				sort -rn > $file;
 		else
-			awk -F'|' '{ sub(/b/,"00",$2); print $2, ":", $1; }' |
-				sort -nr | awk -F' : ' '{ print $NF }' > $file;
+			awk -F'|' '{ sub(/b/,"00",$2); sub(/,/,"",$2); print $2, ":", $1; }' |
+				sort -rn | awk -F' : ' '{ print $NF }' > $file;
 		fi
 		cat $file | head -n $limit |
 			if $usecolor; then colored; else cat /dev/stdin; fi
