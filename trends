@@ -19,15 +19,17 @@ colored() {
 }
 
 eksi=false
+rate=true
 google=false
 nation=GB
 usecolor=false
 limit=10
 
 # Args
-while getopts :egcl:n: args; do
+while getopts :ergcl:n: args; do
 	case $args in
 		(e) eksi=true;;
+		(r) rate=false;;
 		(c) usecolor=true;;
 		(l) limit="$OPTARG";;
 		(g) google=true;;
@@ -44,7 +46,13 @@ if $eksi || ! $google; then
 	file=/tmp/eksitrends.txt
 	curl -s  $eksurl | 
 		pup -p '.topic-list.partial > li a text{}' | paste -d "|"  - - |
-		awk -F'|' '{ sub(/b/,"00",$2); print $2, ":", $1; }' | sort -nr > $file;
+		if $rate; then
+			awk -F'|' '{ sub(/b/,"00",$2); print $2, ":", $1; }' |
+				sort -nr > $file;
+		else
+			awk -F'|' '{ sub(/b/,"00",$2); print $2, ":", $1; }' |
+				sort -nr | awk -F' : ' '{ print $NF }' > $file;
+		fi
 		cat $file | head -n $limit |
 			if $usecolor; then colored; else cat /dev/stdin; fi
 fi
