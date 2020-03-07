@@ -18,7 +18,7 @@ colored() {
 
 limit=10
 nation=gb
-use_eksi=true
+use_eksi=false
 use_rate=false
 use_color=false
 use_google=false
