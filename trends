@@ -31,7 +31,7 @@ while getopts :egrcl:n: args; do
 		(c) use_color=true;;
 		(l) limit="$OPTARG";;
 		(g) use_google=true;;
-		(n) nation=`echo $OPTARG | tr [:upper:] [:lower:]`;;
+		(n) use_google=true; nation=`echo $OPTARG | tr [:upper:] [:lower:]`;;
 		(h) usage; exit 0;;
 		([?]) usage; exit 2;;
 	esac
