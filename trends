@@ -5,9 +5,10 @@
 #
 # TODO Store history in sqlite with dates.
 
+usagemessage='[ -akeg ] [ -l limit ] [ -n countrycode ]'
 usage() {
 	name=$(echo $0 | awk -F'/' '{ printf $NF}')
-	>&2 echo "usage: $name [ -e ] [ -g ] [ -l limit ] [ -n countrycode ]";
+	>&2 echo "usage: $name $usagemessage";
 }
 colored() {
 	colorcode=1;
@@ -18,31 +19,38 @@ colored() {
 	done
 }
 
+appstore=false
+appstore_kind=ios-finance
 eksi=false
-rate=true
+rate=false
 google=false
-nation=GB
+nation=gb
 usecolor=false
 limit=10
 
 # Args
-while getopts :ergcl:n: args; do
+while getopts :ergak:cl:n: args; do
 	case $args in
+		(a) appstore=true;;
+		(k) appstore=true; appstore_kind="$OPTARG";;
 		(e) eksi=true;;
 		(r) rate=false;;
 		(c) usecolor=true;;
 		(l) limit="$OPTARG";;
 		(g) google=true;;
-		(n) google=true; nation=`echo $OPTARG | tr [:lower:] [:upper:]`;;
+		(n) nation=`echo $OPTARG | tr [:upper:] [:lower:]`;;
 		(h) usage; exit 0;;
 		([?]) usage; exit 2;;
 	esac
 done
-goourl=https://trends.google.com/trends/trendingsearches/daily/rss?geo=$nation
+
+goourl=https://trends.google.com/trends/trendingsearches/daily/rss?geo=`\
+	echo $nation | tr [:lower:] [:upper:]`
 eksurl=https://eksisozluk.com
+apsurl=https://apps.apple.com/$nation/genre/$appstore_kind/id6015
 
 # Request & Results
-if $eksi || ! $google; then
+if $eksi && ( ! $google && ! $appstore ); then
 	file=/tmp/eksitrends.txt
 	curl -s  $eksurl | 
 		pup -p '.topic-list.partial > li a text{}' | paste -d "|"  - - |
@@ -60,6 +68,12 @@ if $google; then
 	file=/tmp/googletrends.txt
 	curl -s $goourl | grep -o '<title>.*<\/title>' |
 		sed 's/^\s*<title>\(.*\)<\/title>/\1/;1d' > $file
+	cat $file | head -n $limit |
+		if $usecolor; then colored; else cat /dev/stdin; fi 
+fi
+if $appstore; then
+	file=/tmp/appstoretrends.txt
+	curl -s $apsurl | pup '#selectedcontent > div > ul > li > a text{}' > $file
 	cat $file | head -n $limit |
 		if $usecolor; then colored; else cat /dev/stdin; fi 
 fi
