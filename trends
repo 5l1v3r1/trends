@@ -1,11 +1,8 @@
 #!/bin/sh
 #
-# Getopts added at 2020 Feb 22
-# Eksi and limit options added at 2020 Feb 5 22:40
-#
 # TODO Store history in sqlite with dates.
 
-usagemessage='[ -akeg ] [ -l limit ] [ -n countrycode ]'
+usagemessage='[ -egrc ] [ -l limit ] [ -n countrycode ]'
 usage() {
 	name=$(echo $0 | awk -F'/' '{ printf $NF}')
 	>&2 echo "usage: $name $usagemessage";
@@ -19,25 +16,21 @@ colored() {
 	done
 }
 
-appstore=false
-appstore_kind=ios-finance
-eksi=false
-rate=false
-google=false
-nation=gb
-usecolor=false
 limit=10
+nation=gb
+use_eksi=true
+use_rate=false
+use_color=false
+use_google=false
 
 # Args
-while getopts :ergak:cl:n: args; do
+while getopts :egrcl:n: args; do
 	case $args in
-		(a) appstore=true;;
-		(k) appstore=true; appstore_kind="$OPTARG";;
-		(e) eksi=true;;
-		(r) rate=true;;
-		(c) usecolor=true;;
+		(e) use_eksi=true;;
+		(r) use_rate=true;;
+		(c) use_color=true;;
 		(l) limit="$OPTARG";;
-		(g) google=true;;
+		(g) use_google=true;;
 		(n) nation=`echo $OPTARG | tr [:upper:] [:lower:]`;;
 		(h) usage; exit 0;;
 		([?]) usage; exit 2;;
@@ -47,14 +40,13 @@ done
 goourl=https://trends.google.com/trends/trendingsearches/daily/rss?geo=`\
 	echo $nation | tr [:lower:] [:upper:]`
 eksurl=https://eksisozluk.com
-apsurl=https://apps.apple.com/$nation/genre/$appstore_kind/id6015
 
 # Request & Results
-if $eksi && ( ! $google && ! $appstore ); then
+if $use_eksi || ! $use_google; then
 	file=/tmp/eksitrends.txt
 	curl -s  $eksurl | 
 		pup -p '.topic-list.partial > li a text{}' | paste -d "|"  - - |
-		if $rate; then
+		if $use_rate; then
 			awk -F'|' '{ sub(/b/,"00",$2); print $2, ":", $1; }' |
 				sort -nr > $file;
 		else
@@ -62,18 +54,12 @@ if $eksi && ( ! $google && ! $appstore ); then
 				sort -nr | awk -F' : ' '{ print $NF }' > $file;
 		fi
 		cat $file | head -n $limit |
-			if $usecolor; then colored; else cat /dev/stdin; fi
+			if $use_color; then colored; else cat /dev/stdin; fi
 fi
-if $google; then
+if $use_google; then
 	file=/tmp/googletrends.txt
 	curl -s $goourl | grep -o '<title>.*<\/title>' |
 		sed 's/^\s*<title>\(.*\)<\/title>/\1/;1d' > $file
 	cat $file | head -n $limit |
-		if $usecolor; then colored; else cat /dev/stdin; fi 
-fi
-if $appstore; then
-	file=/tmp/appstoretrends.txt
-	curl -s $apsurl | pup '#selectedcontent > div > ul > li > a text{}' > $file
-	cat $file | head -n $limit |
-		if $usecolor; then colored; else cat /dev/stdin; fi 
+		if $use_color; then colored; else cat /dev/stdin; fi 
 fi
