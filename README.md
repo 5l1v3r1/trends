@@ -20,17 +20,17 @@ install ./trends /usr/local/bin
 ## Usage
 
 ```sh
-trends [ -e ] [ -g ] [ -l limit ] [ -n countrycode ]
+trends [ -egrc ] [ -l limit ] [ -n countrycode ]
 ```
 
 > Note `< required >` `[ optional ]`
 
 ### Options
 - `-e`		**eksisozluk (is the default option if no args given).**
-- `-r`		**disable eksisozluk rate.**
-- `-g`		**show google daily trends for default nation (GB).**
-- `-c`		**color the top 3 trends.**
-- `-n CC`	**show google daily trends of specified nation.**
+- `-g`		**show google daily trends.**
+- `-r`		**enable rates.**
+- `-c`		**format and color the top 3 trends.**
+- `-n CC`	**specify the nation (gb, us, il etc.) (default: gb).**
 - `-l NR`	**limit (default: 10)**
 
 ## Examples
@@ -42,16 +42,16 @@ Show eksisozluk gundem.
 $ trends
 ```
 ```txt
-564 | cennetten indiği düşünülen melodi 
-405 | atakan kayalar 
-328 | wuhan virüsü 
-309 | süleyman soylu'nun polis mesaisi açıklaması 
-271 | türklerin hıristiyan olması halinde olabilecekler 
-269 | elif can yetim 
-222 | illerin en kötü ilçeleri 
-209 | sevgili edinme konusunda hiçbir şey yapmayan insan 
-197 | adil rami 
-193 | setenay cankat'ın a spor'dan kovulması 
+rehberdeki en ünlü kişi 
+türkiye'nin covid-19 vakalarını saklama ihtimali 
+15 ocak 2020 adliyeye canavar girmesi 
+recep tayyip erdoğan'ın serveti 
+koltukaltı kokusunu engellemenin yolları 
+çinçin mahallesinin 3.92 gigapiksellik fotoğrafı 
+wuhan virüsü 
+ibb'nin koyduğu dezenfektan cihazlarının kırılması 
+kemalistlerin osmanlı düşmanı olması 
+ekşi itiraf 
 ```
  
 Show google trends for default nation (Great Britain).
@@ -60,16 +60,16 @@ Show google trends for default nation (Great Britain).
 $ trends -g
 ```
 ```txt
-Sussex Royal
-Bayern Munich
-Virgin cruises
-Tyson Fury fight
-Quaden Bayles
-Friends
-EastEnders
-Judy Finnigan
-JLS tickets
-June Brown
+Liverpool vs Bournemouth
+Yoel Romero
+Amber Rudd
+Tony Ferguson
+SXSW
+Rugby
+Six Nations
+Post Malone
+Spenser Confidential
+Nottingham Forest
 ```
 
 ### Limiting
@@ -79,19 +79,19 @@ For eksisozluk
 $ trends -el3
 ```
 ```txt
-573 | van'da arama kurtarma ekibinin üzerine çığ düşmesi
-524 | yalın'ın zalim parçasının yazarlardaki hatırası
-362 | cnn türk'ün ismi cnn akp olarak değiştirilsin
+rehberdeki en ünlü kişi 
+türkiye'nin covid-19 vakalarını saklama ihtimali 
+15 ocak 2020 adliyeye canavar girmesi 
 ```
  
 For google
 ```sh
-$ trends -nGB -l3
+$ trends -n il -l 3
 ```
 ```txt
-Sussex Royal
-Bayern Munich
-Virgin cruises
+Spenser Confidential
+רצח בהוד השרון
+אוזני המן מתכון
 ```
 
 ### Coloring (using tput)
@@ -100,35 +100,43 @@ $ trends -ec
 ```
 ![image](./img/colored_output.png "Colored Output")
 
-### Disable Rates
+### Enable Rates
 ```sh
 $ trends -er
 ```
 ```txt
-23 şubat 2020 fenerbahçe galatasaray maçı 
-üniversitede sevgilisiyle kalan kızla evlenmek 
-wuhan virüsü 
-22 şubat 2020 van'da corona virüs şüphesi 
-playstation 1'de oynanmış en güzel oyun 
-ersun yanal 
-seni de seni seveni de sevmiyoruz 
-23 şubat 2020 kadıköy belediyesi paylaşımı 
-ruh eşin nerede 
-ali koç 
+478 rehberdeki en ünlü kişi 
+354 türkiye'nin covid-19 vakalarını saklama ihtimali 
+350 15 ocak 2020 adliyeye canavar girmesi 
+346 recep tayyip erdoğan'ın serveti 
+280 koltukaltı kokusunu engellemenin yolları 
+279 çinçin mahallesinin 3.92 gigapiksellik fotoğrafı 
+270 wuhan virüsü 
+259 ibb'nin koyduğu dezenfektan cihazlarının kırılması 
+253 kemalistlerin osmanlı düşmanı olması 
+158 ekşi itiraf 
 ```
-
-### Showing Both Platforms with the Limit 3 and Nation TR for Google
 ```sh
-$ trends -egl3 -ntr
+$ trends -gr
 ```
 ```txt
-565 | cennetten indiği düşünülen melodi 
-400 | atakan kayalar 
-326 | wuhan virüsü 
-Setenay Cankat
-Hercai 33. bölüm
-Muhterem Nur
+1 Liverpool vs Bournemouth
+2 Yoel Romero
+3 Amber Rudd
+4 Tony Ferguson
+5 SXSW
+6 Rugby
+7 Six Nations
+8 Post Malone
+9 Spenser Confidential
+10 Nottingham Forest
 ```
+
+### Show Both Platforms with Limit 3, Rates and Color for Turkey
+```sh
+$ trends -egcrl3 -ntr
+```
+![image](./img/all_options.png "All Options")
 
 > Note: No need to specify -g if the -n option used. Because nation option is
 > only available for google trends, not others. So it is automatically triggers

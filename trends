@@ -1,7 +1,6 @@
 #!/bin/sh
 #
 # TODO Store history in sqlite with dates.
-#
 
 usagemessage='[ -egrc ] [ -l limit ] [ -n countrycode ]'
 usage() {
@@ -19,7 +18,7 @@ colored() {
 
 limit=10
 nation=gb
-use_eksi=true
+use_eksi=false
 use_rate=false
 use_color=false
 use_google=false
@@ -32,7 +31,7 @@ while getopts :egrcl:n: args; do
 		(c) use_color=true;;
 		(l) limit="$OPTARG";;
 		(g) use_google=true;;
-		(n) nation=`echo $OPTARG | tr [:upper:] [:lower:]`;;
+		(n) use_google=true; nation=`echo $OPTARG | tr [:upper:] [:lower:]`;;
 		(h) usage; exit 0;;
 		([?]) usage; exit 2;;
 	esac
@@ -47,13 +46,9 @@ if $use_eksi || ! $use_google; then
 	file=/tmp/eksitrends.txt
 	curl -s  $eksurl | 
 		pup -p '.topic-list.partial > li a text{}' | paste -d "|"  - - |
-		if $use_rate; then
-			awk -F'|' '{ sub(/b/,"00",$2); print $2, ":", $1; }' |
-				sort -nr > $file;
-		else
-			awk -F'|' '{ sub(/b/,"00",$2); sub(/,/,"",$2); print $2, ":", $1; }' |
-				sort -rn | awk -F' : ' '{ print $NF }' > $file;
-		fi
+		awk -F'|' '{ sub(/b/,"00",$2); print $2, $1; }' |
+			sort -nr |
+			if ! $use_rate; then cut -d' ' -f2-; else cat /dev/stdin; fi > $file;
 		cat $file | head -n $limit |
 			if $use_color; then colored; else cat /dev/stdin; fi
 fi
@@ -62,5 +57,6 @@ if $use_google; then
 	curl -s $goourl | grep -o '<title>.*<\/title>' |
 		sed 's/^\s*<title>\(.*\)<\/title>/\1/;1d' > $file
 	cat $file | head -n $limit |
+		if $use_rate; then awk '{print NR, $0}'; else cat /dev/stdin; fi |
 		if $use_color; then colored; else cat /dev/stdin; fi 
 fi
