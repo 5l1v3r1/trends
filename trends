@@ -34,7 +34,7 @@ while getopts :ergak:cl:n: args; do
 		(a) appstore=true;;
 		(k) appstore=true; appstore_kind="$OPTARG";;
 		(e) eksi=true;;
-		(r) rate=false;;
+		(r) rate=true;;
 		(c) usecolor=true;;
 		(l) limit="$OPTARG";;
 		(g) google=true;;
