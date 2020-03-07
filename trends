@@ -47,10 +47,10 @@ if $use_eksi || ! $use_google; then
 	curl -s  $eksurl | 
 		pup -p '.topic-list.partial > li a text{}' | paste -d "|"  - - |
 		if $use_rate; then
-			awk -F'|' '{ sub(/b/,"00",$2); print $2, ":", $1; }' |
+			awk -F'|' '{ sub(/b/,"00",$2); print $2, $1; }' |
 				sort -nr > $file;
 		else
-			awk -F'|' '{ sub(/b/,"00",$2); print $2, ":", $1; }' |
+			awk -F'|' '{ sub(/b/,"00",$2); print $2, $1; }' |
 				sort -nr | awk -F' : ' '{ print $NF }' > $file;
 		fi
 		cat $file | head -n $limit |
@@ -61,5 +61,6 @@ if $use_google; then
 	curl -s $goourl | grep -o '<title>.*<\/title>' |
 		sed 's/^\s*<title>\(.*\)<\/title>/\1/;1d' > $file
 	cat $file | head -n $limit |
+		if $use_rate; then awk '{print NR, $0}'; else cat /dev/stdin; fi |
 		if $use_color; then colored; else cat /dev/stdin; fi 
 fi
