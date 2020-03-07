@@ -20,7 +20,7 @@ install ./trends /usr/local/bin
 ## Usage
 
 ```sh
-trends [ -egrc ] [ -l limit ] [ -n countrycode ]
+trends [ -e ] [ -g ] [ -r ] [ -c ] [ -l limit ] [ -n countrycode ]
 ```
 
 > Note `< required >` `[ optional ]`
