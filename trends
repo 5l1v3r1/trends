@@ -3,9 +3,10 @@
 # TODO Store history in sqlite with dates.
 #
 
+usagemessage='[ -egrc ] [ -l limit ] [ -n countrycode ]'
 usage() {
 	name=$(echo $0 | awk -F'/' '{ printf $NF}')
-	>&2 echo "usage: $name [ -e ] [ -g ] [ -l limit ] [ -n countrycode ]";
+	>&2 echo "usage: $name $usagemessage";
 }
 colored() {
 	colorcode=1;
@@ -16,48 +17,50 @@ colored() {
 	done
 }
 
-eksi=false
-rate=true
-google=false
-nation=GB
-usecolor=false
 limit=10
+nation=gb
+use_eksi=true
+use_rate=false
+use_color=false
+use_google=false
 
 # Args
-while getopts :ergcl:n: args; do
+while getopts :egrcl:n: args; do
 	case $args in
-		(e) eksi=true;;
-		(r) rate=false;;
-		(c) usecolor=true;;
+		(e) use_eksi=true;;
+		(r) use_rate=true;;
+		(c) use_color=true;;
 		(l) limit="$OPTARG";;
-		(g) google=true;;
-		(n) google=true; nation=`echo $OPTARG | tr [:lower:] [:upper:]`;;
+		(g) use_google=true;;
+		(n) nation=`echo $OPTARG | tr [:upper:] [:lower:]`;;
 		(h) usage; exit 0;;
 		([?]) usage; exit 2;;
 	esac
 done
-goourl=https://trends.google.com/trends/trendingsearches/daily/rss?geo=$nation
+
+goourl=https://trends.google.com/trends/trendingsearches/daily/rss?geo=`\
+	echo $nation | tr [:lower:] [:upper:]`
 eksurl=https://eksisozluk.com
 
 # Request & Results
-if $eksi || ! $google; then
+if $use_eksi || ! $use_google; then
 	file=/tmp/eksitrends.txt
 	curl -s  $eksurl | 
 		pup -p '.topic-list.partial > li a text{}' | paste -d "|"  - - |
-		if $rate; then
-			awk -F'|' '{ sub(/b/,"00",$2); sub(/,/,"",$2); print $2, ":", $1; }' |
-				sort -rn > $file;
+		if $use_rate; then
+			awk -F'|' '{ sub(/b/,"00",$2); print $2, ":", $1; }' |
+				sort -nr > $file;
 		else
 			awk -F'|' '{ sub(/b/,"00",$2); sub(/,/,"",$2); print $2, ":", $1; }' |
 				sort -rn | awk -F' : ' '{ print $NF }' > $file;
 		fi
 		cat $file | head -n $limit |
-			if $usecolor; then colored; else cat /dev/stdin; fi
+			if $use_color; then colored; else cat /dev/stdin; fi
 fi
-if $google; then
+if $use_google; then
 	file=/tmp/googletrends.txt
 	curl -s $goourl | grep -o '<title>.*<\/title>' |
 		sed 's/^\s*<title>\(.*\)<\/title>/\1/;1d' > $file
 	cat $file | head -n $limit |
-		if $usecolor; then colored; else cat /dev/stdin; fi 
+		if $use_color; then colored; else cat /dev/stdin; fi 
 fi
