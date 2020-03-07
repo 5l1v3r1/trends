@@ -46,13 +46,9 @@ if $use_eksi || ! $use_google; then
 	file=/tmp/eksitrends.txt
 	curl -s  $eksurl | 
 		pup -p '.topic-list.partial > li a text{}' | paste -d "|"  - - |
-		if $use_rate; then
-			awk -F'|' '{ sub(/b/,"00",$2); print $2, $1; }' |
-				sort -nr > $file;
-		else
-			awk -F'|' '{ sub(/b/,"00",$2); print $2, $1; }' |
-				sort -nr | awk -F' : ' '{ print $NF }' > $file;
-		fi
+		awk -F'|' '{ sub(/b/,"00",$2); print $2, $1; }' |
+			sort -nr |
+			if ! $use_rate; then cut -d' ' -f2-; else cat /dev/stdin; fi > $file;
 		cat $file | head -n $limit |
 			if $use_color; then colored; else cat /dev/stdin; fi
 fi
