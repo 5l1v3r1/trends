@@ -4,8 +4,7 @@
 
 usagemessage='[ -egrc ] [ -l limit ] [ -n countrycode ]'
 usage() {
-	name=$(echo $0 | awk -F'/' '{ printf $NF}')
-	>&2 echo "usage: $name $usagemessage";
+	>&2 echo "usage: `basename $0` $usagemessage";
 }
 colored() {
 	colorcode=1;
