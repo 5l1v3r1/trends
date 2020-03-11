@@ -4,8 +4,7 @@
 
 usagemessage='[ -egrc ] [ -l limit ] [ -n countrycode ]'
 usage() {
-	name=$(echo $0 | awk -F'/' '{ printf $NF}')
-	>&2 echo "usage: $name $usagemessage";
+	>&2 echo "usage: `basename $0` $usagemessage";
 }
 colored() {
 	colorcode=1;
@@ -46,7 +45,7 @@ if $use_eksi || ! $use_google; then
 	file=/tmp/eksitrends.txt
 	curl -s  $eksurl | 
 		pup -p '.topic-list.partial > li a text{}' | paste -d "|"  - - |
-		awk -F'|' '{ sub(/b/,"00",$2); print $2, $1; }' |
+		awk -F'|' '{ sub(/b/,"00",$2); sub(/,/,"",$2); print $2, $1; }' |
 			sort -nr |
 			if ! $use_rate; then cut -d' ' -f2-; else cat /dev/stdin; fi > $file;
 		cat $file | head -n $limit |
