@@ -1,8 +1,26 @@
 #!/bin/sh
 #
-# TODO Store history in sqlite with dates.
+# =========================================================================== #
+# File:        trends                                                         #
+# Description: Get trends from eksi or google                                 #
+# Author:      ihsan <ihsanl at pm dot me>                                    #
+# Updated At:  1586813602                                                     #
+# License:     MIT License                                                    #
+# =========================================================================== #
 
-usagemessage='[ -egrc ] [ -l limit ] [ -n countrycode ]'
+dir_cache=$HOME/.trends;
+dir_eksi=$dir_cache/eksi;
+dir_google=$dir_cache/google;
+goourl=https://trends.google.com/trends/trendingsearches/daily/rss?geo=`\
+	echo $nation | tr [:lower:] [:upper:]`
+eksurl=https://eksisozluk.com
+
+mkdir -p $dir_cache
+mkdir -p $dir_eksi
+mkdir -p $dir_google
+# Funcs {{{1
+
+usagemessage='[ -egRc ] [ -l limit ] [ -n countrycode ]'
 usage() {
 	>&2 echo "usage: `basename $0` $usagemessage";
 }
@@ -15,18 +33,22 @@ colored() {
 	done
 }
 
+# }}}
+# Args {{{1
+
 limit=10
 nation=gb
 use_eksi=false
-use_rate=false
+use_rate=true
 use_color=false
 use_google=false
 
-# Args
-while getopts :egrcl:n: args; do
+while getopts :egRrCcl:n: args; do
 	case $args in
 		(e) use_eksi=true;;
+		(R) use_rate=false;;
 		(r) use_rate=true;;
+		(C) use_color=false;;
 		(c) use_color=true;;
 		(l) limit="$OPTARG";;
 		(g) use_google=true;;
@@ -36,23 +58,22 @@ while getopts :egrcl:n: args; do
 	esac
 done
 
-goourl=https://trends.google.com/trends/trendingsearches/daily/rss?geo=`\
-	echo $nation | tr [:lower:] [:upper:]`
-eksurl=https://eksisozluk.com
+# }}}
 
 # Request & Results
 if $use_eksi || ! $use_google; then
-	file=/tmp/eksitrends.txt
-	curl -s  $eksurl | 
-		pup -p '.topic-list.partial > li a text{}' | paste -d "|"  - - |
-		awk -F'|' '{ sub(/b/,"00",$2); sub(/,/,"",$2); print $2, $1; }' |
-			sort -nr |
-			if ! $use_rate; then cut -d' ' -f2-; else cat /dev/stdin; fi > $file;
-		cat $file | head -n $limit |
-			if $use_color; then colored; else cat /dev/stdin; fi
+	file="${dir_eksi}/$(date +%s).json"
+	curl -s $eksurl |
+		pup -p '.topic-list.partial a:not(.pinned) json{}' |
+		jq '[.[] | {entry_count: .children[].text, text: .text, link: .href}] |
+		sort_by(.entry_count | tonumber) | reverse' > $file
+	jq -jr '.[] | .entry_count, " ", .text, "\n"' $file |
+		head -n $limit |
+		if $use_rate; then cat /dev/stdin; else cut -d' ' -f2-; fi |
+		if $use_color; then colored; else cat /dev/stdin; fi
 fi
 if $use_google; then
-	file=/tmp/googletrends.txt
+	file="${dir_google}/$(date +%s).txt"
 	curl -s $goourl | grep -o '<title>.*<\/title>' |
 		sed 's/^\s*<title>\(.*\)<\/title>/\1/;1d' > $file
 	cat $file | head -n $limit |
