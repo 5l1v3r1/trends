@@ -20,7 +20,30 @@ mkdir -p $dir_eksi
 mkdir -p $dir_google
 # Funcs {{{1
 
-usagemessage='[ -egRc ] [ -l limit ] [ -n countrycode ]'
+get_eksi_gundem() {
+	curl -s $eksurl |
+		pup -p '.topic-list.partial a:not(.pinned) json{}' |
+		jq '[.[] |
+		{
+			entry_count: .children[].text | tonumber,
+			text: .text,
+			link: .href | split("?")[0]
+		}] | sort_by(.entry_count | tonumber) | reverse'
+}
+get_eksi_subject_best() {
+	curl -s "${eksurl}$(jq -r '.[0].link' $1)?a=nice" |
+		pup -p '#entry-item-list > li json{}' |
+		jq '[.[] |
+		{
+			entry_id: ."data-id",
+			entry: .children[0].text,
+			author: ."data-author",
+			favourite: ."data-favorite-count" | tonumber
+		}] | sort_by(.favourite | tonumber) | reverse' |
+		# TODO 1586824856: Make this below optionally colorful.
+		jq -jr '.[0] | "author: ", .author, " fav: ", .favourite, "\n", .entry'
+}
+usagemessage='[ -ebguRrCc ] [ -l limit ] [ -n countrycode ]'
 usage() {
 	>&2 echo "usage: `basename $0` $usagemessage";
 }
@@ -38,20 +61,24 @@ colored() {
 
 limit=10
 nation=gb
-use_eksi=false
+best=false
 use_rate=true
+use_eksi=false
+use_urls=false
 use_color=false
 use_google=false
 
-while getopts :egRrCcl:n: args; do
+while getopts :egbuRrCcl:n: args; do
 	case $args in
+		(b) best=true;;
 		(e) use_eksi=true;;
-		(R) use_rate=false;;
 		(r) use_rate=true;;
-		(C) use_color=false;;
+		(u) use_urls=true;;
+		(R) use_rate=false;;
 		(c) use_color=true;;
-		(l) limit="$OPTARG";;
+		(C) use_color=false;;
 		(g) use_google=true;;
+		(l) limit="$OPTARG";;
 		(n) use_google=true; nation=`echo $OPTARG | tr [:upper:] [:lower:]`;;
 		(h) usage; exit 0;;
 		([?]) usage; exit 2;;
@@ -59,19 +86,28 @@ while getopts :egRrCcl:n: args; do
 done
 
 # }}}
+# Request & Results {{{1
 
-# Request & Results
-if $use_eksi || ! $use_google; then
+if $best; then
 	file="${dir_eksi}/$(date +%s).json"
-	curl -s $eksurl |
-		pup -p '.topic-list.partial a:not(.pinned) json{}' |
-		jq '[.[] | {entry_count: .children[].text, text: .text, link: .href}] |
-		sort_by(.entry_count | tonumber) | reverse' > $file
-	jq -jr '.[] | .entry_count, " ", .text, "\n"' $file |
-		head -n $limit |
-		if $use_rate; then cat /dev/stdin; else cut -d' ' -f2-; fi |
-		if $use_color; then colored; else cat /dev/stdin; fi
+	get_eksi_gundem > $file
+	jq -r '.[0].text' $file
+	echo
+	get_eksi_subject_best $file
+elif $use_eksi || ! $use_google; then
+	file="${dir_eksi}/$(date +%s).json"
+	get_eksi_gundem > $file
+	if $use_urls; then
+		jq -jr '.[] | .entry_count, " ", .text, " | href=https://eksisozluk.com",
+		.link, "\n"' $file
+	else
+		jq -jr '.[] | .entry_count, " ", .text, "\n"' $file
+	fi |
+	head -n $limit |
+	if $use_rate; then cat /dev/stdin; else cut -d' ' -f2-; fi |
+	if $use_color; then colored; else cat /dev/stdin; fi
 fi
+
 if $use_google; then
 	file="${dir_google}/$(date +%s).txt"
 	curl -s $goourl | grep -o '<title>.*<\/title>' |
@@ -80,3 +116,5 @@ if $use_google; then
 		if $use_rate; then awk '{print NR, $0}'; else cat /dev/stdin; fi |
 		if $use_color; then colored; else cat /dev/stdin; fi 
 fi
+
+# }}}
