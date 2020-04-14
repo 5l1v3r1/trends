@@ -41,7 +41,10 @@ get_eksi_subject_best() {
 			favourite: ."data-favorite-count" | tonumber
 		}] | sort_by(.favourite | tonumber) | reverse' |
 		# TODO 1586824856: Make this below optionally colorful.
-		jq -jr '.[0] | "author: ", .author, " fav: ", .favourite, "\n", .entry'
+		jq -jr '.[0] |
+			"fav: ", .favourite, "\n",
+			"author: ", .author, "\n\n",
+			.entry' | fold -sw 80
 }
 usagemessage='[ -ebguRrCc ] [ -l limit ] [ -n countrycode ]'
 usage() {
@@ -91,7 +94,7 @@ done
 if $best; then
 	file="${dir_eksi}/$(date +%s).json"
 	get_eksi_gundem > $file
-	jq -r '.[0].text' $file
+	echo "title: $(jq -r '.[0].text' $file)"
 	echo
 	get_eksi_subject_best $file
 elif $use_eksi || ! $use_google; then
