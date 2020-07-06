@@ -1,27 +1,25 @@
 #!/bin/sh
-#
-# =========================================================================== #
-# File:        trends                                                         #
-# Description: Get trends from eksi or google                                 #
-# Author:      ihsan <ihsanl at pm dot me>                                    #
-# Updated At:  1586813602                                                     #
-# License:     MIT License                                                    #
-# =========================================================================== #
 
-dir_cache=$HOME/.trends;
-dir_eksi=$dir_cache/eksi;
-dir_google=$dir_cache/google;
-goourl=https://trends.google.com/trends/trendingsearches/daily/rss?geo=`\
-	echo $nation | tr [:lower:] [:upper:]`
-eksurl=https://eksisozluk.com
+# ===========================================================================
+# File:        trends
+# Description: Get trends from eksi or google
+# Author:      ihsan <ihsanl at pm dot me>
+# Updated At:  1594063049
+# License:     MIT License
+# ===========================================================================
 
-mkdir -p $dir_cache
-mkdir -p $dir_eksi
-mkdir -p $dir_google
+dir_cache=/Volumes/SDB/personal/.trends
+dir_eksi=$dir_cache/eksi
+dir_google=$dir_cache/google
+
+mkdir -p "$dir_cache"
+mkdir -p "$dir_eksi"
+mkdir -p "$dir_google"
+
 # Funcs {{{1
 
 get_eksi_gundem() {
-	curl -s $eksurl |
+	curl -s "$eksurl" |
 		pup -p '.topic-list.partial a:not(.pinned) json{}' |
 		jq '[.[] |
 		{
@@ -31,7 +29,7 @@ get_eksi_gundem() {
 		}] | sort_by(.entry_count | tonumber) | reverse'
 }
 get_eksi_subject_best() {
-	curl -s "${eksurl}$(jq -r '.[0].link' $1)?a=nice" |
+	curl -s "${eksurl}$(jq -r '.[0].link' "$1")?a=nice" |
 		pup -p '#entry-item-list > li json{}' |
 		jq '[.[] |
 		{
@@ -48,14 +46,15 @@ get_eksi_subject_best() {
 }
 usagemessage='[ -ebguRrCc ] [ -l limit ] [ -n countrycode ]'
 usage() {
-	>&2 echo "usage: `basename $0` $usagemessage";
+	>&2 echo "usage: $(basename "$0") $usagemessage";
 }
 colored() {
 	colorcode=1;
 	while IFS= read -r line; do
 		[ $colorcode -lt 3 ] && tput bold;
-		tput setaf $colorcode; printf " • $line\n"; tput sgr0;
-		[ $colorcode -ge 3 ] && colorcode=15 || let colorcode++
+		tput setaf $colorcode; printf " • %s\n" "$line"; tput sgr0;
+		if [ $colorcode -ge 3 ]; then colorcode=15;
+		else colorcode=$(( colorcode + 1 )); fi
 	done
 }
 
@@ -63,7 +62,7 @@ colored() {
 # Args {{{1
 
 limit=10
-nation=gb
+nation=GB
 best=false
 use_rate=true
 use_eksi=false
@@ -71,7 +70,7 @@ use_urls=false
 use_color=false
 use_google=false
 
-while getopts :egbuRrCcl:n: args; do
+while getopts :ehgbuRrCcl:n: args; do
 	case $args in
 		(b) best=true;;
 		(e) use_eksi=true;;
@@ -82,7 +81,7 @@ while getopts :egbuRrCcl:n: args; do
 		(C) use_color=false;;
 		(g) use_google=true;;
 		(l) limit="$OPTARG";;
-		(n) use_google=true; nation=`echo $OPTARG | tr [:upper:] [:lower:]`;;
+		(n) use_google=true; nation=$(echo "$OPTARG" | tr '[:lower:]' '[:upper:]');;
 		(h) usage; exit 0;;
 		([?]) usage; exit 2;;
 	esac
@@ -91,33 +90,38 @@ done
 # }}}
 # Request & Results {{{1
 
+eksurl=https://eksisozluk.com
+goourl="https://trends.google.com/trends/trendingsearches/daily/rss?geo=$nation"
+
 if $best; then
 	file="${dir_eksi}/$(date +%s).json"
-	get_eksi_gundem > $file
-	echo "title: $(jq -r '.[0].text' $file)"
+	get_eksi_gundem > "$file"
+	echo "title: $(jq -r '.[0].text' "$file")"
 	echo
-	get_eksi_subject_best $file
+	get_eksi_subject_best "$file"
 elif $use_eksi || ! $use_google; then
 	file="${dir_eksi}/$(date +%s).json"
-	get_eksi_gundem > $file
+	get_eksi_gundem > "$file"
 	if $use_urls; then
 		jq -jr '.[] | .entry_count, " ", .text, " | href=https://eksisozluk.com",
-		.link, "\n"' $file
+		.link, "\n"' "$file"
 	else
-		jq -jr '.[] | .entry_count, " ", .text, "\n"' $file
+		jq -jr '.[] | .entry_count, " ", .text, "\n"' "$file"
 	fi |
-	head -n $limit |
+	head -n "$limit" |
 	if $use_rate; then cat /dev/stdin; else cut -d' ' -f2-; fi |
 	if $use_color; then colored; else cat /dev/stdin; fi
 fi
 
 if $use_google; then
 	file="${dir_google}/$(date +%s).txt"
-	curl -s $goourl | grep -o '<title>.*<\/title>' |
-		sed 's/^\s*<title>\(.*\)<\/title>/\1/;1d' > $file
-	cat $file | head -n $limit |
+	curl -s "$goourl" | grep -o '<title>.*<\/title>' |
+		sed 's/^\s*<title>\(.*\)<\/title>/\1/;1d' > "$file"
+	 head -n "$limit" "$file" |
 		if $use_rate; then awk '{print NR, $0}'; else cat /dev/stdin; fi |
 		if $use_color; then colored; else cat /dev/stdin; fi 
 fi
 
 # }}}
+
+# : vim: set fdm=marker :
