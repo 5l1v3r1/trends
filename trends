@@ -4,11 +4,11 @@
 # File:        trends
 # Description: Get trends from eksi or google
 # Author:      ihsan <ihsanl at pm dot me>
-# Updated At:  1594063049
+# Updated At:  1603473545, 1594063049
 # License:     MIT License
 # ===========================================================================
 
-dir_cache=/Volumes/SDB/personal/.trends
+dir_cache=$HOME/.cache/trends
 dir_eksi=$dir_cache/eksi
 dir_google=$dir_cache/google
 
