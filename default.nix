@@ -10,6 +10,7 @@ with pkgs; stdenv.mkDerivation rec {
 	phases = [ "installphase" "postFixup" ];
 	nativeBuildInputs = [ makeWrapper ];
 	wrapperPath = with stdenv.lib; makeBinPath ([
+		jq
 		pup
 		curl
 	]);
